@@ -26,9 +26,9 @@
     --card-bg: #2d2d2d;
     --card-shadow: 0 4px 12px rgba(0,0,0,0.2);
     --tab-bg: #1e1e1e;
-    --tab-btn-bg: #333333;
+    --tab-btn-bg: #444444; /* تفتيح لون الزر ليكون أوضح */
     --tab-btn-active: #64b5f6;
-    --tab-text: #aaaaaa;
+    --tab-text: #e0e0e0; /* تفتيح لون النص ليكون مقروء */
     --tab-text-active: #121212;
     --accent-blue: #64b5f6;
     --positive: #81c784;
@@ -41,7 +41,7 @@ body {
     background-color: var(--bg-page);
     color: var(--text-main);
     margin: 0;
-    padding: 10px; /* Reduced padding for smaller screens */
+    padding: 15px;
     display: flex;
     justify-content: center;
     transition: background-color 0.3s ease;
@@ -51,14 +51,14 @@ body {
 .app-container {
     background-color: var(--bg-container);
     width: 100%;
-    max-width: 1400px; /* Wider max-width to fit screen better */
+    max-width: 96%; /* توسيع الحاوية لتأخذ معظم عرض الشاشة */
     border-radius: 12px;
     box-shadow: var(--card-shadow);
     display: flex;
     flex-direction: column;
-    height: 95vh; /* Take up most of viewport height */
+    height: 96vh;
     border: 1px solid var(--border-color);
-    overflow: hidden; /* Prevent body scroll */
+    overflow: hidden;
 }
 
 /* --- Header --- */
@@ -91,27 +91,29 @@ body {
 /* --- Tabs Navigation --- */
 .tabs-container {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     padding: 12px 20px;
     background: var(--tab-bg);
     border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scrollbar-width: none; /* Hide scrollbar Firefox */
+    -webkit-overflow-scrolling: touch;
+    /* إخفاء سكرول التابات */
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
 }
 .tabs-container::-webkit-scrollbar {
-    display: none; /* Hide scrollbar Chrome/Safari */
+    display: none; 
 }
 
 .tab-btn {
-    padding: 8px 16px;
+    padding: 8px 18px;
     border: none;
     background: var(--tab-btn-bg);
     color: var(--tab-text);
     border-radius: 20px;
     cursor: pointer;
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     white-space: nowrap;
     transition: all 0.2s ease;
 }
@@ -128,14 +130,20 @@ body {
     flex-grow: 1;
     padding: 20px;
     -webkit-overflow-scrolling: touch;
+    /* إخفاء شريط التمرير الجانبي تماماً كما طلبت */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollable-content::-webkit-scrollbar {
+    display: none;
 }
 
 /* --- Grid & Cards --- */
 .cards-grid {
     display: grid;
-    /* Responsive Grid: min 300px wide columns, max as many as fit */
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 20px;
+    /* تصغير العرض الأدنى قليلاً ليسمح بـ 5 بوكسات بجانب بعضها */
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+    gap: 18px;
 }
 
 .card {
@@ -144,13 +152,24 @@ body {
     box-shadow: var(--card-shadow);
     padding: 16px;
     border: 1px solid var(--border-color);
-    border-left: 5px solid var(--accent-blue);
+    border-left: 5px solid var(--accent-blue); /* الخط الأزرق الافتراضي */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
 }
 
 .card:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+/* تصميم خاص ليوم الجمعة */
+.card.friday {
+    border-left: 5px solid var(--positive); /* خط أخضر احترافي */
+}
+
+.card.friday .date-title {
+    color: var(--positive); /* تلوين العنوان بالأخضر */
+    border-bottom-color: rgba(30, 142, 62, 0.2);
 }
 
 .date-title {
@@ -160,13 +179,22 @@ body {
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 8px;
     font-size: 1.05rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.day-name {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: normal;
 }
 
 .row {
     display: flex;
     justify-content: space-between;
     margin: 8px 0;
-    font-size: 0.95em;
+    font-size: 0.92em;
 }
 
 .label { color: var(--text-secondary); }
@@ -204,17 +232,17 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* --- Media Queries for Mobile/Responsive --- */
+/* --- Mobile Responsive --- */
 @media (max-width: 600px) {
     .app-container {
         height: 100vh;
+        max-width: 100%;
         border-radius: 0;
         border: none;
     }
     body { padding: 0; }
     .cards-grid {
-        grid-template-columns: 1fr; /* Single column on mobile */
+        grid-template-columns: 1fr; 
         gap: 15px;
     }
-    .scrollable-content { padding: 15px; }
 }
