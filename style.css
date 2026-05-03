@@ -1,100 +1,96 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f4f8; /* لون خلفية الصفحة بالكامل */
+    background-color: #eef2f6;
     margin: 0;
-    display: flex;
-    justify-content: center; /* توسيط التطبيق في نصف الشاشة */
     padding: 20px;
 }
 
 .app-container {
-    background-color: #f4f7fb;
+    background-color: #fff;
     width: 100%;
-    max-width: 380px; /* تحديد العرض ليطابق شكل النافذة الجانبية */
+    max-width: 1200px; /* عرض أكبر ليتسع للبطاقات بجانب بعضها */
+    margin: 0 auto;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border: 1px solid #e1e5ea;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
-    height: 90vh; /* طول التطبيق */
+    height: 90vh;
 }
 
 .header {
-    padding: 15px 20px;
-    border-bottom: 1px solid #e1e5ea;
-    background-color: #fff;
-    border-radius: 12px 12px 0 0;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
 }
 
-.header h2 {
-    margin: 0;
-    font-size: 1.1rem;
-    color: #3c4043;
+/* تصميم التابات */
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    overflow-x: auto; /* للسماح بالتمرير إذا زادت الشهور */
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    border: none;
+    background: #e1e5ea;
+    border-radius: 20px;
+    cursor: pointer;
     font-weight: 500;
+    color: #5f6368;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background: #1a73e8;
+    color: white;
+}
+
+/* تقسيم الشبكة (Grid) للبطاقات */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* يضع البطاقات بجانب بعضها */
+    gap: 20px;
+    padding: 20px;
 }
 
 .scrollable-content {
-    padding: 15px;
     overflow-y: auto;
     flex-grow: 1;
 }
 
-/* تخصيص شكل شريط التمرير (Scrollbar) ليطابق جوجل */
-.scrollable-content::-webkit-scrollbar {
-    width: 8px;
-}
-.scrollable-content::-webkit-scrollbar-thumb {
-    background-color: #9aa0a6;
-    border-radius: 4px;
-}
-
 .card {
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     padding: 15px;
-    margin-bottom: 15px;
-    border-left: 4px solid #1a73e8; /* الخط الأزرق على الشمال */
+    border-left: 5px solid #1a73e8;
+    border: 1px solid #f0f0f0;
+    border-left: 5px solid #1a73e8;
 }
 
 .date-title {
     font-weight: bold;
-    font-size: 1.05em;
     color: #1a73e8;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     border-bottom: 1px solid #f1f3f4;
-    padding-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding-bottom: 5px;
 }
 
 .row {
     display: flex;
     justify-content: space-between;
-    margin: 6px 0;
+    margin: 8px 0;
     font-size: 0.9em;
 }
 
-.label {
-    color: #5f6368; /* اللون الرمادي للنصوص */
-}
+.label { color: #5f6368; }
+.value { font-weight: 600; }
+.positive { color: #1e8e3e; }
+.negative { color: #d93025; }
 
-.value {
-    font-weight: 600;
-    color: #202124; /* اللون الأسود للأرقام */
-}
-
-.positive {
-    color: #1e8e3e; /* أخضر للموجب */
-}
-
-.negative {
-    color: #d93025; /* أحمر للسالب */
-}
-
-.loading {
-    text-align: center;
-    color: #5f6368;
-    margin-top: 20px;
-}
+.loading { grid-column: 1 / -1; text-align: center; padding: 40px; }
