@@ -10,7 +10,8 @@
     const CSV_URL =
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vQN4XD2dzhAfryhsCdKL3DsL82J-8kCINh-fqnjrsuIiWZlUzR60BKuiP0MnUe8nyAkTx4nmSrdCHaj/pub?gid=0&single=true&output=csv";
 
-    const TARGET_HOURS = 4000;
+    const TARGET_DAILY = 4000;
+    const TARGET_WEEKLY = 28000; // 4000 * 7 days
 
     const MONTH_NAMES = [
         "January", "February", "March", "April", "May", "June",
@@ -21,6 +22,7 @@
     let monthlyData = {};
     let activeMonth = "";
     let isDark = false;
+    let currentView = "daily"; // 'daily' or 'weekly'
 
     /* ──── DOM Refs ──── */
     const $ = (sel) => document.querySelector(sel);
@@ -30,6 +32,7 @@
     const tabsNav        = $("#tabs-nav");
     const tabsSkeleton   = $("#tabs-skeleton");
     const statsBar       = $("#stats-bar");
+    const viewControls   = $("#view-controls");
     const loadingState   = $("#loading");
     const errorState     = $("#error-state");
     const errorMessage   = $("#error-message");
@@ -41,43 +44,28 @@
        ================================================================ */
     const ICONS = {
         calendar: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-
         users: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-
         clock: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
-
         barChart: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
-
         target: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
-
         trendUp: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',
-
         trendDown: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>',
-
-        /* Larger versions for stats bar */
+        /* Larger versions */
         calendarLg: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-
         clockLg: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
-
         usersLg: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
-
         barChartLg: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>',
-
         targetLg: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
     };
 
     /* ================================================================
-       THEME MANAGEMENT
+       THEME & TOGGLE MANAGEMENT
        ================================================================ */
     function initTheme() {
         const saved = localStorage.getItem("dashboard-theme");
         isDark = saved === "dark";
-
-        if (isDark) {
-            document.documentElement.setAttribute("data-theme", "dark");
-        } else {
-            document.documentElement.removeAttribute("data-theme");
-        }
+        if (isDark) document.documentElement.setAttribute("data-theme", "dark");
+        else document.documentElement.removeAttribute("data-theme");
     }
 
     function toggleTheme() {
@@ -90,8 +78,17 @@
             localStorage.setItem("dashboard-theme", "light");
         }
     }
-
     themeToggleBtn.addEventListener("click", toggleTheme);
+
+    const segBtns = $$(".seg-btn");
+    segBtns.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            segBtns.forEach(b => b.classList.remove("active"));
+            e.target.classList.add("active");
+            currentView = e.target.getAttribute("data-view");
+            renderCards(); // Re-render grid based on selected view
+        });
+    });
 
     /* ================================================================
        DATA FETCHING & PARSING
@@ -147,7 +144,7 @@
 
                 const totalUsers = stats[date].users.size;
                 const totalHours = stats[date].totalHours;
-                const diff       = totalHours - TARGET_HOURS;
+                const diff       = totalHours - TARGET_DAILY;
 
                 const properDate = `${year}-${monthDay}`;
                 let dayName = "";
@@ -164,6 +161,7 @@
                     dayName,
                     isFriday,
                     totalUsers,
+                    usersSet: stats[date].users, // Preserve users set for weekly aggregation
                     totalHours: totalHours.toFixed(2),
                     avg: totalUsers > 0 ? (totalHours / totalUsers).toFixed(2) : "0.00",
                     diff: diff.toFixed(2),
@@ -187,6 +185,7 @@
         errorState.style.display   = "none";
         cardsGrid.style.display    = "none";
         statsBar.style.display     = "none";
+        if(viewControls) viewControls.style.display = "none";
         tabsSkeleton.style.display = "flex";
     }
 
@@ -201,6 +200,7 @@
         errorState.style.display   = "flex";
         cardsGrid.style.display    = "none";
         statsBar.style.display     = "none";
+        if(viewControls) viewControls.style.display = "none";
         errorMessage.textContent   = msg + ". Please check your connection and try again.";
     }
 
@@ -208,6 +208,7 @@
         errorState.style.display = "none";
         cardsGrid.style.display  = "grid";
         statsBar.style.display   = "grid";
+        if(viewControls) viewControls.style.display = "flex";
     }
 
     retryBtn.addEventListener("click", fetchAndProcessData);
@@ -222,14 +223,12 @@
     }
 
     function renderTabs() {
-        /* Remove old tab buttons (keep skeleton) */
         const oldBtns = tabsNav.querySelectorAll(".tab-btn");
         oldBtns.forEach((btn) => btn.remove());
 
         const months = getSortedMonths();
         if (months.length === 0) return;
 
-        /* Create tabs container */
         const tabsInner = document.createElement("div");
         tabsInner.className = "tabs-inner";
         tabsNav.appendChild(tabsInner);
@@ -333,7 +332,7 @@
     }
 
     /* ================================================================
-       RENDER: CARDS
+       RENDER: CARDS (Daily & Weekly Views)
        ================================================================ */
     function renderCards() {
         const days = (monthlyData[activeMonth] || []).slice().sort(
@@ -342,86 +341,185 @@
 
         cardsGrid.innerHTML = "";
 
-        days.forEach((item, index) => {
-            const diffNum  = parseFloat(item.diff);
-            const hoursNum = parseFloat(item.totalHours);
-            const pct      = Math.min((hoursNum / TARGET_HOURS) * 100, 100);
-            const isOver   = diffNum >= 0;
+        // ----- WEEKLY VIEW LOGIC -----
+        if (currentView === 'weekly') {
+            const weeksMap = {};
 
-            /* Accent class */
-            let accentClass = "card-accent-default";
-            if (item.isFriday) accentClass = "";
-            else if (isOver)  accentClass = "card-accent-over";
-            else              accentClass = "card-accent-under";
+            days.forEach(item => {
+                const parts = item.date.split(',');
+                const year = parts[0].trim();
+                const monthDay = parts[1].trim();
+                const properDate = `${year}-${monthDay}`;
 
-            /* Progress fill class */
-            let fillClass = "fill-default";
-            if (item.isFriday) fillClass = "";
-            else if (isOver)   fillClass = "fill-over";
-            else               fillClass = "fill-under";
+                const d = new Date(properDate);
+                if(isNaN(d.getTime())) return;
 
-            const card = document.createElement("div");
-            card.className = "card" + (item.isFriday ? " card-friday" : "") + " " + accentClass;
-            card.style.animationDelay = `${index * 40}ms`;
+                // Group by week (Monday to Sunday)
+                const dayOfWeek = d.getDay();
+                const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                const monday = new Date(d);
+                monday.setDate(monday.getDate() - diffToMonday);
 
-            card.innerHTML = `
-                <!-- Accent Stripe -->
-                <div class="card-accent">
-                    <div class="card-accent-inner"></div>
-                </div>
+                const sunday = new Date(monday);
+                sunday.setDate(sunday.getDate() + 6);
 
-                <!-- Header -->
-                <div class="card-header">
-                    <div class="card-header-left">
-                        <div class="card-date-icon">${ICONS.calendar}</div>
-                        <div class="card-date-info">
-                            <div class="card-date-text">${escapeHtml(item.date)}</div>
-                            <div class="card-day-row">
-                                <span class="card-day-name">${escapeHtml(item.dayName)}</span>
-                                ${item.isFriday ? '<span class="friday-badge">FRIDAY</span>' : ""}
+                const monthNamesShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const formatShort = (dateObj) => `${monthNamesShort[dateObj.getMonth()]} ${String(dateObj.getDate()).padStart(2, '0')}`;
+
+                const weekKey = `${formatShort(monday)} - ${formatShort(sunday)}`;
+
+                if(!weeksMap[weekKey]) {
+                    weeksMap[weekKey] = {
+                        label: weekKey,
+                        year: monday.getFullYear(),
+                        mondayTime: monday.getTime(),
+                        usersSet: new Set(),
+                        totalHours: 0
+                    };
+                }
+
+                // Merge unique users and sum hours
+                item.usersSet.forEach(u => weeksMap[weekKey].usersSet.add(u));
+                weeksMap[weekKey].totalHours += parseFloat(item.totalHours);
+            });
+
+            const weeksArray = Object.values(weeksMap).sort((a,b) => b.mondayTime - a.mondayTime); // newest week first
+
+            weeksArray.forEach((weekItem, index) => {
+                const diffNum  = weekItem.totalHours - TARGET_WEEKLY;
+                const hoursNum = weekItem.totalHours;
+                const pct      = Math.min((hoursNum / TARGET_WEEKLY) * 100, 100);
+                const isOver   = diffNum >= 0;
+                const totalUsers = weekItem.usersSet.size;
+                const avg = totalUsers > 0 ? (hoursNum / totalUsers).toFixed(2) : "0.00";
+
+                let accentClass = isOver ? "card-accent-over" : "card-accent-under";
+                let fillClass   = isOver ? "fill-over" : "fill-under";
+
+                const card = document.createElement("div");
+                card.className = "card " + accentClass;
+                card.style.animationDelay = `${index * 40}ms`;
+
+                card.innerHTML = `
+                    <div class="card-accent"><div class="card-accent-inner"></div></div>
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-date-icon">${ICONS.calendar}</div>
+                            <div class="card-date-info">
+                                <div class="card-date-text">Week of ${escapeHtml(weekItem.label)}</div>
+                                <div class="card-day-row">
+                                    <span class="card-day-name">${weekItem.year}</span>
+                                    <span class="friday-badge" style="background:var(--bg-secondary); color:var(--text-secondary)">7 DAYS</span>
+                                </div>
                             </div>
                         </div>
+                        <div class="card-diff-badge ${isOver ? "positive" : "negative"}">
+                            ${isOver ? ICONS.trendUp : ICONS.trendDown}
+                            <span>${diffNum > 0 ? "+" : ""}${formatNum(Math.abs(diffNum))}</span>
+                        </div>
                     </div>
-                    <div class="card-diff-badge ${isOver ? "positive" : "negative"}">
-                        ${isOver ? ICONS.trendUp : ICONS.trendDown}
-                        <span>${diffNum > 0 ? "+" : ""}${formatNum(Math.abs(diffNum))}</span>
+                    <div class="card-progress-section">
+                        <div class="card-progress-header">
+                            <span class="card-progress-label">Weekly Target Progress</span>
+                            <span class="card-progress-pct">${pct.toFixed(1)}%</span>
+                        </div>
+                        <div class="card-progress-track">
+                            <div class="card-progress-fill ${fillClass}" data-width="${pct}"></div>
+                        </div>
                     </div>
-                </div>
+                    <div class="card-data-rows">
+                        <div class="card-row">
+                            <div class="card-row-label">${ICONS.users}<span>Weekly Active Users</span></div>
+                            <span class="card-row-value">${totalUsers}</span>
+                        </div>
+                        <div class="card-row">
+                            <div class="card-row-label">${ICONS.clock}<span>Total Hours</span></div>
+                            <span class="card-row-value">${formatNum(hoursNum)}</span>
+                        </div>
+                        <div class="card-row">
+                            <div class="card-row-label">${ICONS.barChart}<span>Avg / Labeler</span></div>
+                            <span class="card-row-value">${avg}</span>
+                        </div>
+                        <div class="card-row card-row-divider">
+                            <div class="card-row-label">${ICONS.target}<span>Weekly Target</span></div>
+                            <span class="card-row-value">${TARGET_WEEKLY.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+                cardsGrid.appendChild(card);
+            });
 
-                <!-- Progress -->
-                <div class="card-progress-section">
-                    <div class="card-progress-header">
-                        <span class="card-progress-label">Target Progress</span>
-                        <span class="card-progress-pct">${pct.toFixed(1)}%</span>
-                    </div>
-                    <div class="card-progress-track">
-                        <div class="card-progress-fill ${fillClass}" data-width="${pct}"></div>
-                    </div>
-                </div>
+        // ----- DAILY VIEW LOGIC -----
+        } else {
+            days.reverse().forEach((item, index) => { // reverse for daily so newest is top
+                const diffNum  = parseFloat(item.diff);
+                const hoursNum = parseFloat(item.totalHours);
+                const pct      = Math.min((hoursNum / TARGET_DAILY) * 100, 100);
+                const isOver   = diffNum >= 0;
 
-                <!-- Data Rows -->
-                <div class="card-data-rows">
-                    <div class="card-row">
-                        <div class="card-row-label">${ICONS.users}<span>Active Users</span></div>
-                        <span class="card-row-value">${item.totalUsers}</span>
-                    </div>
-                    <div class="card-row">
-                        <div class="card-row-label">${ICONS.clock}<span>Total Hours</span></div>
-                        <span class="card-row-value">${formatNum(hoursNum)}</span>
-                    </div>
-                    <div class="card-row">
-                        <div class="card-row-label">${ICONS.barChart}<span>Avg / Labeler</span></div>
-                        <span class="card-row-value">${item.avg}</span>
-                    </div>
-                    <div class="card-row card-row-divider">
-                        <div class="card-row-label">${ICONS.target}<span>Daily Target</span></div>
-                        <span class="card-row-value">${TARGET_HOURS.toLocaleString()}</span>
-                    </div>
-                </div>
-            `;
+                let accentClass = "card-accent-default";
+                if (item.isFriday) accentClass = "";
+                else if (isOver)  accentClass = "card-accent-over";
+                else              accentClass = "card-accent-under";
 
-            cardsGrid.appendChild(card);
-        });
+                let fillClass = "fill-default";
+                if (item.isFriday) fillClass = "";
+                else if (isOver)   fillClass = "fill-over";
+                else               fillClass = "fill-under";
+
+                const card = document.createElement("div");
+                card.className = "card" + (item.isFriday ? " card-friday" : "") + " " + accentClass;
+                card.style.animationDelay = `${index * 40}ms`;
+
+                card.innerHTML = `
+                    <div class="card-accent"><div class="card-accent-inner"></div></div>
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-date-icon">${ICONS.calendar}</div>
+                            <div class="card-date-info">
+                                <div class="card-date-text">${escapeHtml(item.date)}</div>
+                                <div class="card-day-row">
+                                    <span class="card-day-name">${escapeHtml(item.dayName)}</span>
+                                    ${item.isFriday ? '<span class="friday-badge">FRIDAY</span>' : ""}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-diff-badge ${isOver ? "positive" : "negative"}">
+                            ${isOver ? ICONS.trendUp : ICONS.trendDown}
+                            <span>${diffNum > 0 ? "+" : ""}${formatNum(Math.abs(diffNum))}</span>
+                        </div>
+                    </div>
+                    <div class="card-progress-section">
+                        <div class="card-progress-header">
+                            <span class="card-progress-label">Daily Target Progress</span>
+                            <span class="card-progress-pct">${pct.toFixed(1)}%</span>
+                        </div>
+                        <div class="card-progress-track">
+                            <div class="card-progress-fill ${fillClass}" data-width="${pct}"></div>
+                        </div>
+                    </div>
+                    <div class="card-data-rows">
+                        <div class="card-row">
+                            <div class="card-row-label">${ICONS.users}<span>Active Users</span></div>
+                            <span class="card-row-value">${item.totalUsers}</span>
+                        </div>
+                        <div class="card-row">
+                            <div class="card-row-label">${ICONS.clock}<span>Total Hours</span></div>
+                            <span class="card-row-value">${formatNum(hoursNum)}</span>
+                        </div>
+                        <div class="card-row">
+                            <div class="card-row-label">${ICONS.barChart}<span>Avg / Labeler</span></div>
+                            <span class="card-row-value">${item.avg}</span>
+                        </div>
+                        <div class="card-row card-row-divider">
+                            <div class="card-row-label">${ICONS.target}<span>Daily Target</span></div>
+                            <span class="card-row-value">${TARGET_DAILY.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+                cardsGrid.appendChild(card);
+            });
+        }
 
         /* Animate progress bars and accent stripes after paint */
         requestAnimationFrame(() => {
