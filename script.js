@@ -14,7 +14,7 @@
     const USERS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQN4XD2dzhAfryhsCdKL3DsL82J-8kCINh-fqnjrsuIiWZlUzR60BKuiP0MnUe8nyAkTx4nmSrdCHaj/pub?gid=1748741633&single=true&output=csv";
 
     const TARGET_DAILY = 4000;
-    const TARGET_WEEKLY = 28000; // 4000 * 7 days
+    const TARGET_WEEKLY = 24000; // تم تعديلها لـ 24000 كما طلبت (6 أيام شغل)
 
     const MONTH_NAMES = [
         "January", "February", "March", "April", "May", "June",
@@ -242,8 +242,7 @@
 
                 const totalUsers = stats[date].users.size;
                 const totalHours = stats[date].totalHours;
-                const diff       = totalHours - TARGET_DAILY;
-
+                
                 const properDate = `${year}-${monthDay}`;
                 let dayName = "";
                 let isFriday = false;
@@ -254,6 +253,14 @@
                     isFriday = d.getDay() === 5;
                 }
 
+                // الحساب الديناميكي ليوم الجمعة (Active Users * 6.25)
+                let dailyTarget = TARGET_DAILY;
+                if (isFriday) {
+                    dailyTarget = totalUsers * 6.25;
+                }
+
+                const diff = totalHours - dailyTarget;
+
                 monthlyData[monthName].push({
                     date,
                     dayName,
@@ -263,6 +270,7 @@
                     totalHours: totalHours.toFixed(2),
                     avg: totalUsers > 0 ? (totalHours / totalUsers).toFixed(2) : "0.00",
                     diff: diff.toFixed(2),
+                    dailyTarget: dailyTarget // تخزين التارجت ليتم عرضه في الكارت
                 });
             }
 
@@ -483,7 +491,7 @@
                 weeksMap[weekKey].totalHours += parseFloat(item.totalHours);
             });
 
-            // ترتيب الأسابيع تصاعدياً (من القديم للجديد)
+            // ترتيب الأسابيع من القديم للجديد
             const weeksArray = Object.values(weeksMap).sort((a,b) => a.mondayTime - b.mondayTime);
 
             weeksArray.forEach((weekItem, index) => {
@@ -557,7 +565,9 @@
             days.forEach((item, index) => {
                 const diffNum  = parseFloat(item.diff);
                 const hoursNum = parseFloat(item.totalHours);
-                const pct      = Math.min((hoursNum / TARGET_DAILY) * 100, 100);
+                const dailyTarget = parseFloat(item.dailyTarget);
+                // منع القسمة على صفر أو ظهور نسب غير صحيحة
+                const pct      = dailyTarget > 0 ? Math.min((hoursNum / dailyTarget) * 100, 100) : 0;
                 const isOver   = diffNum >= 0;
 
                 let accentClass = "card-accent-default";
@@ -618,7 +628,7 @@
                         </div>
                         <div class="card-row card-row-divider">
                             <div class="card-row-label">${ICONS.target}<span>Daily Target</span></div>
-                            <span class="card-row-value">${TARGET_DAILY.toLocaleString()}</span>
+                            <span class="card-row-value">${dailyTarget.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2})}</span>
                         </div>
                     </div>
                 `;
