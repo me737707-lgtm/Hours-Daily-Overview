@@ -335,6 +335,7 @@
        RENDER: CARDS (Daily & Weekly Views)
        ================================================================ */
     function renderCards() {
+        // ترتيب الأيام تصاعدياً بناءً على التاريخ (من القديم للجديد)
         const days = (monthlyData[activeMonth] || []).slice().sort(
             (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
         );
@@ -383,7 +384,8 @@
                 weeksMap[weekKey].totalHours += parseFloat(item.totalHours);
             });
 
-            const weeksArray = Object.values(weeksMap).sort((a,b) => b.mondayTime - a.mondayTime); // newest week first
+            // ترتيب الأسابيع تصاعدياً بناءً على وقت يوم الإثنين (من الأسبوع الأول للأخير)
+            const weeksArray = Object.values(weeksMap).sort((a,b) => a.mondayTime - b.mondayTime);
 
             weeksArray.forEach((weekItem, index) => {
                 const diffNum  = weekItem.totalHours - TARGET_WEEKLY;
@@ -451,7 +453,8 @@
 
         // ----- DAILY VIEW LOGIC -----
         } else {
-            days.reverse().forEach((item, index) => { // reverse for daily so newest is top
+            // تم إزالة .reverse() هنا عشان نعرض الأيام بالترتيب الطبيعي (من يوم 1 لحد 30)
+            days.forEach((item, index) => {
                 const diffNum  = parseFloat(item.diff);
                 const hoursNum = parseFloat(item.totalHours);
                 const pct      = Math.min((hoursNum / TARGET_DAILY) * 100, 100);
