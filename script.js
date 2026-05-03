@@ -38,7 +38,6 @@ async function fetchAndProcessData() {
             const row = dataRows[i];
             if (!row.trim()) continue;
             
-            // إرجاع طريقة التقسيم القوية لتخطي الفاصلة الموجودة في التاريخ
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length < 4) continue;
 
@@ -59,12 +58,13 @@ async function fetchAndProcessData() {
         monthlyData = {};
         
         for (const date in stats) {
-            // استخراج السنة والشهر
             const parts = date.split(',');
             if(parts.length < 2) continue; 
             
             const year = parts[0].trim();
-            const monthNum = parts[1].trim().split('-')[0];
+            const monthDay = parts[1].trim(); // مثال: 04-01
+            const monthNum = monthDay.split('-')[0];
+            
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             
             const index = parseInt(monthNum) - 1;
@@ -78,8 +78,21 @@ async function fetchAndProcessData() {
             const totalHours = stats[date].totalHours;
             const diff = totalHours - TARGET_HOURS;
 
+            // تحويل التاريخ لصيغة مفهومة للجافاسكريبت لاستخراج اليوم
+            const properDateString = `${year}-${monthDay}`;
+            let dayNameEnglish = "";
+            let isFriday = false;
+            
+            const d = new Date(properDateString);
+            if (!isNaN(d)) {
+                dayNameEnglish = d.toLocaleDateString('en-US', { weekday: 'long' }); // يعطي الجمعة = Friday
+                isFriday = (d.getDay() === 5); // رقم 5 هو يوم الجمعة في الجافاسكريبت
+            }
+
             monthlyData[monthName].push({
                 date: date,
+                dayName: dayNameEnglish,
+                isFriday: isFriday,
                 totalUsers: totalUsers,
                 totalHours: totalHours.toFixed(2),
                 avg: totalUsers > 0 ? (totalHours / totalUsers).toFixed(2) : "0.00",
@@ -87,7 +100,6 @@ async function fetchAndProcessData() {
             });
         }
 
-        // إخفاء مؤشر التحميل بعد الانتهاء
         const spinner = document.getElementById('loading-spinner');
         if(spinner) spinner.style.display = 'none';
         
@@ -104,7 +116,6 @@ function renderTabs() {
     const tabsNav = document.getElementById('tabs-nav');
     tabsNav.innerHTML = '';
     
-    // ترتيب الشهور
     const months = Object.keys(monthlyData).sort((a,b) => new Date(b) - new Date(a));
 
     months.forEach((month, index) => {
@@ -126,16 +137,21 @@ function renderMonthCards(monthName) {
     const grid = document.getElementById('cards-grid');
     grid.innerHTML = '';
     
-    // ترتيب الأيام: من أول يوم في الشهر لآخره (كما طلبت)
     const days = monthlyData[monthName].sort((a,b) => new Date(a.date) - new Date(b.date));
 
     days.forEach(item => {
         const diffClass = item.diff >= 0 ? 'positive' : 'negative';
         const diffSign = item.diff > 0 ? '+' : '';
         
+        // إضافة كلاس friday إذا كان اليوم جمعة
+        const cardClass = item.isFriday ? 'card friday' : 'card';
+        
         const card = `
-            <div class="card">
-                <div class="date-title">🗓️ ${item.date}</div>
+            <div class="${cardClass}">
+                <div class="date-title">
+                    <span>🗓️ ${item.date}</span>
+                    <span class="day-name">${item.dayName}</span>
+                </div>
                 <div class="row"><span class="label">Total Active Users:</span> <span class="value">${item.totalUsers}</span></div>
                 <div class="row"><span class="label">Total Hours:</span> <span class="value">${item.totalHours}</span></div>
                 <div class="row"><span class="label">Avg Hour/Labeler:</span> <span class="value">${item.avg}</span></div>
@@ -147,5 +163,4 @@ function renderMonthCards(monthName) {
     });
 }
 
-// تشغيل السكربت
 fetchAndProcessData();
