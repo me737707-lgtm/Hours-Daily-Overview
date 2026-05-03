@@ -12,7 +12,6 @@
 <body>
     <div class="dashboard">
 
-        <!-- ──── Header ──── -->
         <header class="header">
             <div class="header-left">
                 <div class="header-logo">
@@ -49,7 +48,6 @@
             </div>
         </header>
 
-        <!-- ──── Tabs ──── -->
         <nav id="tabs-nav" class="tabs-nav" role="tablist">
             <div class="tabs-skeleton" id="tabs-skeleton">
                 <span class="skeleton-pill" style="width:120px"></span>
@@ -60,13 +58,17 @@
             </div>
         </nav>
 
-        <!-- ──── Summary Stats ──── -->
         <section id="stats-bar" class="stats-bar" style="display:none"></section>
 
-        <!-- ──── Main Content ──── -->
+        <div id="view-controls" class="view-controls" style="display:none">
+            <div class="segmented-control">
+                <button class="seg-btn active" data-view="daily">Daily View</button>
+                <button class="seg-btn" data-view="weekly">Weekly View</button>
+            </div>
+        </div>
+
         <main class="main-content">
 
-            <!-- Loading -->
             <div id="loading" class="loading-state">
                 <div class="loading-spinner">
                     <div class="spinner-ring"></div>
@@ -83,7 +85,6 @@
                 </div>
             </div>
 
-            <!-- Error -->
             <div id="error-state" class="error-state" style="display:none">
                 <div class="error-icon">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -95,12 +96,11 @@
                 <button id="retry-btn" class="retry-btn">Retry</button>
             </div>
 
-            <!-- Cards Grid -->
             <div id="cards-grid" class="cards-grid" style="display:none"></div>
 
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=8"></script>
 </body>
 </html>
