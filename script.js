@@ -3,7 +3,6 @@ const TARGET_HOURS = 4000;
 
 let monthlyData = {};
 
-// Theme Setup
 const themeToggleBtn = document.getElementById('theme-toggle');
 const currentTheme = localStorage.getItem('theme') || 'light';
 
@@ -62,7 +61,7 @@ async function fetchAndProcessData() {
             if(parts.length < 2) continue; 
             
             const year = parts[0].trim();
-            const monthDay = parts[1].trim(); // مثال: 04-01
+            const monthDay = parts[1].trim(); 
             const monthNum = monthDay.split('-')[0];
             
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -78,15 +77,14 @@ async function fetchAndProcessData() {
             const totalHours = stats[date].totalHours;
             const diff = totalHours - TARGET_HOURS;
 
-            // تحويل التاريخ لصيغة مفهومة للجافاسكريبت لاستخراج اليوم
             const properDateString = `${year}-${monthDay}`;
             let dayNameEnglish = "";
             let isFriday = false;
             
             const d = new Date(properDateString);
             if (!isNaN(d)) {
-                dayNameEnglish = d.toLocaleDateString('en-US', { weekday: 'long' }); // يعطي الجمعة = Friday
-                isFriday = (d.getDay() === 5); // رقم 5 هو يوم الجمعة في الجافاسكريبت
+                dayNameEnglish = d.toLocaleDateString('en-US', { weekday: 'long' });
+                isFriday = (d.getDay() === 5);
             }
 
             monthlyData[monthName].push({
@@ -116,11 +114,15 @@ function renderTabs() {
     const tabsNav = document.getElementById('tabs-nav');
     tabsNav.innerHTML = '';
     
-    const months = Object.keys(monthlyData).sort((a,b) => new Date(b) - new Date(a));
+    // ترتيب الشهور من الأقدم للأحدث (April ثم May)
+    const months = Object.keys(monthlyData).sort((a,b) => new Date(a) - new Date(b));
 
     months.forEach((month, index) => {
         const btn = document.createElement('button');
-        btn.className = `tab-btn ${index === 0 ? 'active' : ''}`;
+        // جعل آخر شهر (الأحدث) هو النشط تلقائياً
+        const isActive = index === months.length - 1;
+        
+        btn.className = `tab-btn ${isActive ? 'active' : ''}`;
         btn.innerText = month;
         btn.onclick = () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -130,7 +132,8 @@ function renderTabs() {
         tabsNav.appendChild(btn);
     });
 
-    if (months.length > 0) renderMonthCards(months[0]);
+    // عرض بيانات أحدث شهر
+    if (months.length > 0) renderMonthCards(months[months.length - 1]);
 }
 
 function renderMonthCards(monthName) {
@@ -142,8 +145,6 @@ function renderMonthCards(monthName) {
     days.forEach(item => {
         const diffClass = item.diff >= 0 ? 'positive' : 'negative';
         const diffSign = item.diff > 0 ? '+' : '';
-        
-        // إضافة كلاس friday إذا كان اليوم جمعة
         const cardClass = item.isFriday ? 'card friday' : 'card';
         
         const card = `
