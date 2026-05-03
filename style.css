@@ -7,9 +7,11 @@
     --border-color: #e1e5ea;
     --card-bg: #ffffff;
     --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    --tab-bg: #ffffff;
+    --tab-bg: #f8f9fa;
+    --tab-btn-bg: #e1e5ea;
+    --tab-btn-active: #1a73e8;
     --tab-text: #5f6368;
-    --tab-hover-bg: rgba(26, 115, 232, 0.04);
+    --tab-text-active: #ffffff;
     --accent-blue: #1a73e8;
     --positive: #1e8e3e;
     --negative: #d93025;
@@ -24,8 +26,10 @@
     --card-bg: #2d2d2d;
     --card-shadow: 0 4px 12px rgba(0,0,0,0.2);
     --tab-bg: #1e1e1e;
-    --tab-text: #aaaaaa;
-    --tab-hover-bg: rgba(255, 255, 255, 0.05);
+    --tab-btn-bg: #444444; /* تفتيح لون الزر ليكون أوضح */
+    --tab-btn-active: #64b5f6;
+    --tab-text: #e0e0e0; /* تفتيح لون النص ليكون مقروء */
+    --tab-text-active: #121212;
     --accent-blue: #64b5f6;
     --positive: #81c784;
     --negative: #e57373;
@@ -47,7 +51,7 @@ body {
 .app-container {
     background-color: var(--bg-container);
     width: 100%;
-    max-width: 96%;
+    max-width: 96%; /* توسيع الحاوية لتأخذ معظم عرض الشاشة */
     border-radius: 12px;
     box-shadow: var(--card-shadow);
     display: flex;
@@ -63,6 +67,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid var(--border-color);
     background-color: var(--bg-container);
 }
 
@@ -73,7 +78,7 @@ body {
 }
 
 .theme-btn {
-    background: var(--border-color);
+    background: var(--tab-btn-bg);
     color: var(--text-main);
     border: none;
     padding: 8px 12px;
@@ -83,51 +88,40 @@ body {
     transition: background 0.3s;
 }
 
-/* --- Tabs Navigation (New Material Design) --- */
+/* --- Tabs Navigation --- */
 .tabs-container {
     display: flex;
-    padding: 0 20px;
+    gap: 12px;
+    padding: 12px 20px;
     background: var(--tab-bg);
     border-bottom: 1px solid var(--border-color);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    /* إخفاء سكرول التابات */
     -ms-overflow-style: none;  
     scrollbar-width: none;  
 }
-
-.tab-btn {
-    padding: 14px 20px;
-    border: none;
-    background: transparent;
-    color: var(--tab-text);
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    white-space: nowrap;
-    position: relative;
-    transition: color 0.2s ease, background-color 0.2s ease;
+.tabs-container::-webkit-scrollbar {
+    display: none; 
 }
 
-.tab-btn:hover {
-    color: var(--text-main);
-    background: var(--tab-hover-bg);
+.tab-btn {
+    padding: 8px 18px;
+    border: none;
+    background: var(--tab-btn-bg);
+    color: var(--tab-text);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition: all 0.2s ease;
 }
 
 .tab-btn.active {
-    color: var(--accent-blue);
-    background: transparent;
-}
-
-/* الخط الأزرق اللي بيظهر تحت التاب النشط */
-.tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px; /* عشان يغطي على البوردر اللي تحته */
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: var(--accent-blue);
-    border-radius: 3px 3px 0 0;
+    background: var(--tab-btn-active);
+    color: var(--tab-text-active);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* --- Main Content Area --- */
@@ -136,6 +130,7 @@ body {
     flex-grow: 1;
     padding: 20px;
     -webkit-overflow-scrolling: touch;
+    /* إخفاء شريط التمرير الجانبي تماماً كما طلبت */
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
@@ -146,6 +141,7 @@ body {
 /* --- Grid & Cards --- */
 .cards-grid {
     display: grid;
+    /* تصغير العرض الأدنى قليلاً ليسمح بـ 5 بوكسات بجانب بعضها */
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
     gap: 18px;
 }
@@ -156,8 +152,9 @@ body {
     box-shadow: var(--card-shadow);
     padding: 16px;
     border: 1px solid var(--border-color);
-    border-left: 5px solid var(--accent-blue);
+    border-left: 5px solid var(--accent-blue); /* الخط الأزرق الافتراضي */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
 }
 
 .card:hover {
@@ -165,12 +162,13 @@ body {
     box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
 
+/* تصميم خاص ليوم الجمعة */
 .card.friday {
-    border-left: 5px solid var(--positive);
+    border-left: 5px solid var(--positive); /* خط أخضر احترافي */
 }
 
 .card.friday .date-title {
-    color: var(--positive);
+    color: var(--positive); /* تلوين العنوان بالأخضر */
     border-bottom-color: rgba(30, 142, 62, 0.2);
 }
 
@@ -234,6 +232,7 @@ body {
     100% { transform: rotate(360deg); }
 }
 
+/* --- Mobile Responsive --- */
 @media (max-width: 600px) {
     .app-container {
         height: 100vh;
