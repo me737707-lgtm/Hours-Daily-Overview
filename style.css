@@ -1,0 +1,100 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f4f8; /* لون خلفية الصفحة بالكامل */
+    margin: 0;
+    display: flex;
+    justify-content: center; /* توسيط التطبيق في نصف الشاشة */
+    padding: 20px;
+}
+
+.app-container {
+    background-color: #f4f7fb;
+    width: 100%;
+    max-width: 380px; /* تحديد العرض ليطابق شكل النافذة الجانبية */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e1e5ea;
+    display: flex;
+    flex-direction: column;
+    height: 90vh; /* طول التطبيق */
+}
+
+.header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #e1e5ea;
+    background-color: #fff;
+    border-radius: 12px 12px 0 0;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #3c4043;
+    font-weight: 500;
+}
+
+.scrollable-content {
+    padding: 15px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* تخصيص شكل شريط التمرير (Scrollbar) ليطابق جوجل */
+.scrollable-content::-webkit-scrollbar {
+    width: 8px;
+}
+.scrollable-content::-webkit-scrollbar-thumb {
+    background-color: #9aa0a6;
+    border-radius: 4px;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #1a73e8; /* الخط الأزرق على الشمال */
+}
+
+.date-title {
+    font-weight: bold;
+    font-size: 1.05em;
+    color: #1a73e8;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #f1f3f4;
+    padding-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+    font-size: 0.9em;
+}
+
+.label {
+    color: #5f6368; /* اللون الرمادي للنصوص */
+}
+
+.value {
+    font-weight: 600;
+    color: #202124; /* اللون الأسود للأرقام */
+}
+
+.positive {
+    color: #1e8e3e; /* أخضر للموجب */
+}
+
+.negative {
+    color: #d93025; /* أحمر للسالب */
+}
+
+.loading {
+    text-align: center;
+    color: #5f6368;
+    margin-top: 20px;
+}
