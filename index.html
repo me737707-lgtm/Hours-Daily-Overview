@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hours Overview Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -10,17 +10,21 @@
     <div class="app-container">
         <div class="header">
             <h2>Hours Overview Dashboard</h2>
+            <button id="theme-toggle" class="theme-btn">🌙 Dark Mode</button>
         </div>
         
         <div id="tabs-nav" class="tabs-container"></div>
 
         <div id="content-area" class="scrollable-content">
-            <div id="cards-grid" class="cards-grid">
-                <div class="loading">جاري معالجة البيانات...</div>
+            <div id="loading-spinner" class="loading-container">
+                <div class="spinner"></div>
+                <p>Loading data...</p>
             </div>
+            <div id="cards-grid" class="cards-grid">
+                </div>
         </div>
     </div>
 
-    <script src="script.js?v=3"></script>
+    <script src="script.js?v=4"></script>
 </body>
 </html>
