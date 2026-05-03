@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hours Overview</title>
+    <title>Hours Overview Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
         <div class="header">
-            <h2>Hours Overview</h2>
+            <h2>Hours Overview Dashboard</h2>
         </div>
-        <div id="content" class="scrollable-content">
-            <div class="loading">جاري تحميل البيانات...</div>
+        
+        <div id="tabs-nav" class="tabs-container"></div>
+
+        <div id="content-area" class="scrollable-content">
+            <div id="cards-grid" class="cards-grid">
+                <div class="loading">جاري معالجة البيانات...</div>
+            </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
