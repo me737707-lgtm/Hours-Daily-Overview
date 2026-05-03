@@ -30,18 +30,16 @@ async function fetchAndProcessData() {
         const response = await fetch(csvUrl);
         const data = await response.text();
         
-        // Fast CSV parsing optimization
         const rows = data.split('\n');
         const dataRows = rows.slice(1);
         const stats = {};
 
-        // Use a simpler split if data doesn't contain commas within quotes for better speed.
-        // If your labeler names have commas, keep the regex: row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
         for (let i = 0; i < dataRows.length; i++) {
             const row = dataRows[i];
             if (!row.trim()) continue;
             
-            const cols = row.split(','); // Faster split
+            // إرجاع طريقة التقسيم القوية لتخطي الفاصلة الموجودة في التاريخ
+            const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length < 4) continue;
 
             let dateStr = cols[0].replace(/"/g, '').trim();
@@ -61,14 +59,14 @@ async function fetchAndProcessData() {
         monthlyData = {};
         
         for (const date in stats) {
+            // استخراج السنة والشهر
             const parts = date.split(',');
-            if(parts.length < 2) continue;
+            if(parts.length < 2) continue; 
             
             const year = parts[0].trim();
             const monthNum = parts[1].trim().split('-')[0];
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             
-            // Ensure monthNum is valid to avoid errors
             const index = parseInt(monthNum) - 1;
             if(index < 0 || index > 11) continue;
             
@@ -89,12 +87,16 @@ async function fetchAndProcessData() {
             });
         }
 
-        document.getElementById('loading-spinner').style.display = 'none';
+        // إخفاء مؤشر التحميل بعد الانتهاء
+        const spinner = document.getElementById('loading-spinner');
+        if(spinner) spinner.style.display = 'none';
+        
         renderTabs();
 
     } catch (error) {
         console.error("Fetch error:", error);
-        document.getElementById('loading-spinner').innerHTML = '<p style="color:red;">Error loading data.</p>';
+        const spinner = document.getElementById('loading-spinner');
+        if(spinner) spinner.innerHTML = '<p style="color:red;">Error loading data.</p>';
     }
 }
 
@@ -102,6 +104,7 @@ function renderTabs() {
     const tabsNav = document.getElementById('tabs-nav');
     tabsNav.innerHTML = '';
     
+    // ترتيب الشهور
     const months = Object.keys(monthlyData).sort((a,b) => new Date(b) - new Date(a));
 
     months.forEach((month, index) => {
@@ -123,7 +126,7 @@ function renderMonthCards(monthName) {
     const grid = document.getElementById('cards-grid');
     grid.innerHTML = '';
     
-    // Sort ascending: Oldest date (1st of month) first, Newest date last.
+    // ترتيب الأيام: من أول يوم في الشهر لآخره (كما طلبت)
     const days = monthlyData[monthName].sort((a,b) => new Date(a.date) - new Date(b.date));
 
     days.forEach(item => {
@@ -144,5 +147,5 @@ function renderMonthCards(monthName) {
     });
 }
 
-// Start processing
+// تشغيل السكربت
 fetchAndProcessData();
