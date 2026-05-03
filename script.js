@@ -17,10 +17,8 @@ async function fetchAndProcessData() {
             const cols = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             if (cols.length < 4) return;
 
-            // تنظيف التاريخ
+            // تنظيف التاريخ (شيلنا السطر اللي كان بيعمل مشكلة المسافة)
             let dateStr = cols[0].replace(/"/g, '').trim();
-            // لو التاريخ فيه وقت، بناخد التاريخ بس
-            if(dateStr.includes(' ')) dateStr = dateStr.split(' ')[0];
             
             const labeler = cols[1].replace(/"/g, '').trim();
             const hoursC = parseFloat(cols[2]) || 0;
@@ -55,7 +53,7 @@ async function fetchAndProcessData() {
             };
         });
 
-        // ترتيب الأيام تنازلياً (الأحدث فوق زي ما في صورتك)
+        // ترتيب الأيام تنازلياً (الأحدث فوق)
         finalData.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         renderCards(finalData);
@@ -78,7 +76,7 @@ function renderCards(data) {
     data.forEach(item => {
         // تحديد اللون (أحمر للسالب، أخضر للموجب)
         const diffClass = item.difference >= 0 ? 'positive' : 'negative';
-        // إضافة علامة + إذا كان الرقم موجب (السالب بيتحط تلقائي)
+        // إضافة علامة + إذا كان الرقم موجب
         const diffSign = item.difference > 0 ? '+' : ''; 
         
         const card = `
