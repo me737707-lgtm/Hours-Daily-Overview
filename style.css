@@ -341,7 +341,7 @@ body {
     grid-template-columns: repeat(5, 1fr);
     gap: 12px;
     padding: 16px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     border-radius: var(--radius-xl);
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -433,6 +433,52 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* ================================================================
+   VIEW CONTROLS (Daily / Weekly Toggle)
+   ================================================================ */
+.view-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    animation: fadeSlideUp 0.4s ease both;
+    animation-delay: 0.1s;
+}
+
+.segmented-control {
+    display: flex;
+    background: var(--bg-secondary);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.seg-btn {
+    border: none;
+    background: transparent;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: var(--font-family);
+}
+
+.seg-btn:hover {
+    color: var(--text-primary);
+}
+
+.seg-btn.active {
+    background: var(--bg-card-solid);
+    color: var(--text-primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] .seg-btn.active {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 /* ================================================================
@@ -742,7 +788,7 @@ body {
     color: var(--friday-text);
 }
 
-/* Friday Badge */
+/* Friday & Week Badge */
 .friday-badge {
     display: inline-flex;
     align-items: center;
@@ -828,29 +874,16 @@ body {
     transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.card-progress-fill.fill-default {
-    background: linear-gradient(90deg, #60a5fa, #3b5bdb);
-}
-
-.card-progress-fill.fill-over {
-    background: linear-gradient(90deg, #60a5fa, #3b5bdb);
-}
-
-.card-progress-fill.fill-under {
-    background: linear-gradient(90deg, #fb923c, #f59e0b);
-}
+.card-progress-fill.fill-default { background: linear-gradient(90deg, #60a5fa, #3b5bdb); }
+.card-progress-fill.fill-over    { background: linear-gradient(90deg, #60a5fa, #3b5bdb); }
+.card-progress-fill.fill-under   { background: linear-gradient(90deg, #fb923c, #f59e0b); }
 
 [data-theme="dark"] .card-progress-fill.fill-default { background: linear-gradient(90deg, #6c8cff, #818cf8); }
 [data-theme="dark"] .card-progress-fill.fill-over    { background: linear-gradient(90deg, #6c8cff, #818cf8); }
 [data-theme="dark"] .card-progress-fill.fill-under   { background: linear-gradient(90deg, #fb923c, #fbbf24); }
 
-.card-friday .card-progress-fill {
-    background: linear-gradient(90deg, #34d399, #0f9d58);
-}
-
-[data-theme="dark"] .card-friday .card-progress-fill {
-    background: linear-gradient(90deg, #34d399, #2dd4bf);
-}
+.card-friday .card-progress-fill { background: linear-gradient(90deg, #34d399, #0f9d58); }
+[data-theme="dark"] .card-friday .card-progress-fill { background: linear-gradient(90deg, #34d399, #2dd4bf); }
 
 /* ──── Data Rows ──── */
 .card-data-rows {
@@ -939,36 +972,14 @@ body {
 /* ================================================================
    SCROLLBAR (global)
    ================================================================ */
-::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.08);
-    border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(0,0,0,0.14);
-}
-
-[data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.06);
-}
-
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.10);
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.14); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.10); }
 
 /* ================================================================
    SELECTION
    ================================================================ */
-::selection {
-    background: var(--color-primary);
-    color: #ffffff;
-}
+::selection { background: var(--color-primary); color: #ffffff; }
